@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom'; // Import the Link component
 import './SignUp.css'; // Make sure the path is correct based on where you place your CSS file
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
 
 
 function SignUp() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
@@ -24,6 +26,8 @@ function SignUp() {
         // Signed in 
         const user = userCredential.user;
         console.log('Account created:', user);
+        alert('Account successfully created! You will be redirected to login.');
+        navigate('/login'); // Redirect the user after success
 
         // You can redirect the user to the home page or show a success message
       })
@@ -32,6 +36,7 @@ function SignUp() {
         const errorMessage = error.message;
         // Handle Errors here.
         console.error('Error signing up:', errorCode, errorMessage);
+        alert('Error signing up: ' + errorCode)
         // You can show the error message to the user
       });
   };
