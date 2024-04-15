@@ -3,12 +3,20 @@ import { Link } from 'react-router-dom'; // Import the Link component
 import './SignUp.css'; // Make sure the path is correct based on where you place your CSS file
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 
+
+
 function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (!email.endsWith("@sjsu.edu")) {
+      alert("Error signing up: Email must end with @sjsu.edu");
+      // Here you can set an error message in your state and show it to the user
+      return; // Prevent the sign up process
+    }
     
     const auth = getAuth();
     createUserWithEmailAndPassword(auth, email, password)
@@ -16,6 +24,7 @@ function SignUp() {
         // Signed in 
         const user = userCredential.user;
         console.log('Account created:', user);
+
         // You can redirect the user to the home page or show a success message
       })
       .catch((error) => {
@@ -26,7 +35,7 @@ function SignUp() {
         // You can show the error message to the user
       });
   };
-  
+
   return (
     <div className="signup-page">
       <img
