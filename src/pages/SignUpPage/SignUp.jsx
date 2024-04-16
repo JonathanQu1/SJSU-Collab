@@ -4,8 +4,6 @@ import './SignUp.css'; // Make sure the path is correct based on where you place
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
-
-
 function SignUp() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -15,7 +13,7 @@ function SignUp() {
     event.preventDefault();
 
     if (!email.endsWith("@sjsu.edu")) {
-      alert("Error signing up: Email must end with @sjsu.edu");
+      alert("Error signing up: email must end with @sjsu.edu");
       // Here you can set an error message in your state and show it to the user
       return; // Prevent the sign up process
     }
