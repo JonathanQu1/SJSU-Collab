@@ -1,14 +1,31 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import './LoginPage.css';
 
 function LoginPage() {
-  const [username, setUsername] = useState('');
+  const navigate = useNavigate(); // Hook to navigate to other routes
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = (event) => {
     event.preventDefault();
-    console.log('Login with:', username, password);
+
+    const auth = getAuth();
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Sign-in successful.
+        console.log('Logged in:', userCredential.user);
+        navigate('/'); // Redirect the user to the homepage
+      })
+      .catch((error) => {
+        // An error happened.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error('Error signing in:', errorCode, errorMessage);
+        alert("Username or password is inccorect, please try again!")
+        // Here you can show an error message to the user
+      });
   };
 
   return (
@@ -18,10 +35,10 @@ function LoginPage() {
         <h2>Welcome Back!</h2>
         <p>Discover a space where diverse talents merge seamlessly. Get started for free.</p>
         <form id="loginForm" onSubmit={handleLogin}>
-          <input type="text" id="username" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+          <input type="email" id="username" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <input type="password" id="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           <button type="submit" id="submit">Login</button>
-        </form>
+      </form>
         <p>Not a member? <Link to="/signup">Register Now</Link></p>
         <p><Link to="/">Home</Link></p>
       </div>
