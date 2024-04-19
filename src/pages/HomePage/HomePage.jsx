@@ -1,109 +1,116 @@
-import './HomePage.css'; // Make sure to create and import your HomePage.css
-import { useState } from 'react';
+import './HomePage.css';
+import { useState, useEffect } from 'react';
 import Header from '../../components/Header/Header.jsx';
+import { getDatabase, ref, onValue, push, set } from 'firebase/database';
+import firebaseApp from '../../configuration/firebase-config';
 
 const HomePage = () => {
-  // Placeholder for post data
-  const [posts, setPosts] = useState([
-    {
-      title: 'Post Title 1',
-      content: 'Post content goes here...',
-      replies: [], // Array to hold replies
-    },
-    {
-      title: 'Post Title 2',
-      content: 'Another post content...',
-      replies: [], // Array to hold replies
-    },
-    // ... other posts
-  ]);
-
+  const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState({ title: '', content: '' });
-  const [replyTexts, setReplyTexts] = useState(posts.map(() => ''));
+  const [replyTexts, setReplyTexts] = useState({}); // State to hold reply texts for each post
+
+  // Reference to the posts in the database
+  const db = getDatabase(firebaseApp);
+  const postsRef = ref(db, 'posts');
+
+  // Fetch posts on component mount
+  useEffect(() => {
+    // Subscribe to posts updates
+    const unsubscribe = onValue(postsRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      const formattedPosts = Object.entries(data).map(([key, value]) => ({
+        id: key,
+        title: value.title,
+        content: value.content,
+        replies: value.replies || [],
+      }));
+      setPosts(formattedPosts);
+      // Reset replyTexts for each post
+      const initialReplyTexts = formattedPosts.reduce((acc, post) => {
+        acc[post.id] = '';
+        return acc;
+      }, {});
+      setReplyTexts(initialReplyTexts);
+    });
+
+    // Unsubscribe from updates on unmount
+    return () => unsubscribe();
+  }, []);
 
   const handleCreatePost = () => {
-    if (newPost.title && newPost.content) {
-      setPosts([...posts, { ...newPost, replies: [] }]);
-      setNewPost({ title: '', content: '' });
-      setReplyTexts([...replyTexts, '']); // Add a new reply state for the new post
-    }
+    const newPostRef = push(postsRef);
+    set(newPostRef, { ...newPost, replies: [] });
+    setNewPost({ title: '', content: '' });
   };
 
-  const handleAddReply = (postIndex, replyText) => {
+  const handleAddReply = (postId, replyText) => {
     if (replyText.trim()) {
-      const updatedPosts = posts.map((post, index) => {
-        if (index === postIndex) {
-          return {
-            ...post,
-            replies: [...post.replies, replyText],
-          };
-        }
-        return post;
-      });
-      setPosts(updatedPosts);
-      const newReplyTexts = [...replyTexts];
-      newReplyTexts[postIndex] = ''; // Reset the reply input for this post only
-      setReplyTexts(newReplyTexts);
+      const postRepliesRef = ref(db, `posts/${postId}/replies`);
+      const newReplyRef = push(postRepliesRef);
+      set(newReplyRef, { text: replyText });
+      // Reset the reply text field
+      setReplyTexts({...replyTexts, [postId]: ''});
     }
   };
 
   return (
     <div>
-      <Header />
-      <main>
-        <input
-          id="postTitle"
-          type="text"
-          placeholder="Title"
-          value={newPost.title}
-          onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-        />
-        <textarea
-          id="postContent"
-          placeholder="Content"
-          value={newPost.content}
-          onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-        ></textarea>
-        <button className="new-post-button" onClick={handleCreatePost}>
-          Create a Post
-        </button>
+    <Header />
+    <main className="create-post-container">
+      <input
+        id="postTitle"
+        type="text"
+        placeholder="Title"
+        value={newPost.title}
+        className="post-input"
+        onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+      />
+      <textarea
+        id="postContent"
+        placeholder="Content"
+        className="post-input"
+        value={newPost.content}
+        onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+      ></textarea>
+      <button className="new-post-button" onClick={handleCreatePost}>
+        Create a Post
+      </button>
 
-        {posts.map((post, postIndex) => (
-          <div className="post" key={postIndex}>
-            <h3>{post.title}</h3>
-            <p>{post.content}</p>
-            <div className="replies">
-              {post.replies.map((reply, replyIndex) => (
-                <div className="reply" key={replyIndex}>
-                  {reply}
-                </div>
-              ))}
+      {posts.map((post) => (
+        <div className="post" key={post.id}>
+          <h3>{post.title}</h3>
+          <p>{post.content}</p>
+          <div className="replies">
+            {post.replies && typeof post.replies === 'object'
+              ? Object.values(post.replies).map((reply, index) => (
+                  <div className="reply" key={index}>
+                    {reply.text}
+                  </div>
+                ))
+              : null}
+            <div className="reply-input-container">
               <input
                 className="reply-input"
                 type="text"
                 placeholder="Write a reply..."
-                value={replyTexts[postIndex]}
-                onChange={(e) => {
-                  const newReplyTexts = [...replyTexts];
-                  newReplyTexts[postIndex] = e.target.value;
-                  setReplyTexts(newReplyTexts);
-                }}
+                value={replyTexts[post.id] || ''}
+                onChange={(e) => setReplyTexts({ ...replyTexts, [post.id]: e.target.value })}
               />
               <button
                 className="reply-button"
-                onClick={() => handleAddReply(postIndex, replyTexts[postIndex])}
+                onClick={() => handleAddReply(post.id, replyTexts[post.id])}
               >
                 Reply
               </button>
             </div>
           </div>
-        ))}
-      </main>
-
-      <footer>
-        <p>SJSU Collab © 2024</p>
-      </footer>
-    </div>
+        </div>
+      ))}
+    </main>
+    <footer>
+      <p>SJSU Collab © 2024</p>
+    </footer>
+  </div>
   );
 };
 

@@ -1,25 +1,23 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    height: 100%;
-  }
-
-main{
-  padding-top: 60px; 
-  margin-top: 50px; 
-  min-height: calc(100vh - 50px); 
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start; 
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  padding-top: 100px; /* Adjust this value based on your header's height */
 }
 
-  #homepageLogo{
-    height: 30px;
-    display: flex;
-    align-self: center;
-  }
+
+.create-post-container{
+  flex:1;
+  display: flex;
+  flex-direction: column;
+  max-width: 768px; 
+  margin: auto; 
+  padding: 20px; 
+  background-color: #ffffff; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  border-radius: 4px; 
+}
+ 
   
   .dropdown {
     position: absolute;
@@ -66,10 +64,6 @@ main{
   
   .dropdown:hover .dropbtn {
     background-color: #003366;
-  }
-  
-  main {
-    padding: 70px 20px 20px;
   }
   
   .post {
@@ -123,7 +117,6 @@ main{
     text-align: center;
     padding: 20px 0;
     margin-top: 20px;
-    background-color: #f4f4f4;
   }
   
 #postTitle,
@@ -153,30 +146,12 @@ main{
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.5); 
 }
 
-.new-post-button {
-  background-color: #f0ad4e; 
-  color: white;
-  padding: 12px 20px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out; 
-}
 
 .new-post-button:hover {
   background-color: #ec971f; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
 }
 
-.create-post-container {
-  max-width: 768px; 
-  margin: auto; 
-  padding: 20px; 
-  background-color: #ffffff; 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
-  border-radius: 4px; 
-}
 
 .reply {
   margin-top: 10px;
