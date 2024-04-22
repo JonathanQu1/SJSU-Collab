@@ -1,3 +1,7 @@
+html{
+  min-height: 100%;
+}
+
 .create-post-container{
   flex:1;
   display: flex;
@@ -107,8 +111,7 @@
   
   footer {
     text-align: center;
-    padding: 20px 0;
-    margin-top: 20px;
+    padding: 20px;
   }
   
 #postTitle,
