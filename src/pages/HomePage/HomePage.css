@@ -1,21 +1,13 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  padding-top: 100px; /* Adjust this value based on your header's height */
-}
-
-
 .create-post-container{
   flex:1;
   display: flex;
   flex-direction: column;
-  max-width: 768px; 
   margin: auto; 
   padding: 20px; 
   background-color: #ffffff; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
   border-radius: 4px; 
+  padding-top:100px;
 }
  
   
