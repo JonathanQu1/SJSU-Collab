@@ -75,8 +75,43 @@
     background-color: #eab239;
     color: white;
     cursor: pointer;
+    text-align: left;
+    font-size: 15px;
 }
 
 .profile-page .profile-container button:hover {
     background-color: #c08301;
 }
+
+.input-group {
+    text-align: left;
+    margin-bottom: 10px;
+  }
+  
+  .file-input-label {
+    display: block; /* Or inline-block, depending on your desired layout */
+    margin-bottom: 5px; /* Adjust as needed */
+    font-weight: bold; /* Optional: if you want the label to be bold */
+  }
+  
+  .file-button-label {
+    display: inline-block;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 123px;
+    font-size: 15px;
+    background-color: #eab239;
+    color: white;
+    text-align: left;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .file-button-label:hover {
+    background-color: #c08301;
+  }
+  
+  
