@@ -5,7 +5,7 @@ import { getDatabase, ref as databaseRef, get } from 'firebase/database';
 import './Header.css';
 
 const Header = () => {
-  const [userProfileImage, setUserProfileImage] = useState('default-profile-image-url');
+  const [userProfileImage, setUserProfileImage] = useState('https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg');
   const auth = getAuth();
   const database = getDatabase();
 
@@ -18,7 +18,7 @@ const Header = () => {
         get(userProfileRef).then((snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.val();
-            setUserProfileImage(data.imageURL || 'default-profile-image-url');
+            setUserProfileImage(data.imageURL || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg');
           }
         }).catch((error) => {
           console.error(error);
@@ -41,7 +41,7 @@ const Header = () => {
           id="profile-image"
           src={userProfileImage}
           alt="Profile"
-          onError={(e) => { e.target.onerror = null; e.target.src = 'default-profile-image-url'; }}
+          onError={(e) => { e.target.onerror = null; e.target.src = 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg'; }}
         />
         </button>
         <div className="dropdown-content">

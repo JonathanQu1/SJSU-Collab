@@ -73,7 +73,7 @@ function ProfilePage() {
       <Header/>
       <main>
         <div className="profile-container">
-          <img src={userImageURL || "https://via.placeholder.com/150"} alt="User Avatar" />
+          <img src={userImageURL || "https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"} alt="User Avatar" />
           <form onSubmit={handleSaveProfile}>
             <input
               type="text"
