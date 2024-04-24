@@ -55,17 +55,27 @@ function ProfilePage() {
   const handleSaveProfile = (event) => {
     event.preventDefault();
     const uid = auth.currentUser.uid;
-    const userImageRef = storageRef(storage, `userImages/${uid}`);
-    uploadBytes(userImageRef, userImage).then((snapshot) => {
-      getDownloadURL(snapshot.ref).then((downloadURL) => {
-        const userProfileRef = databaseRef(database, 'users/' + uid);
-        set(userProfileRef, {
-          username: username,
-          imageURL: downloadURL
+    const userProfileRef = databaseRef(database, 'users/' + uid);
+  
+    if (userImage) {
+      // User selected a new image, upload it and then save profile
+      const userImageRef = storageRef(storage, `userImages/${uid}`);
+      uploadBytes(userImageRef, userImage).then((snapshot) => {
+        getDownloadURL(snapshot.ref).then((downloadURL) => {
+          set(userProfileRef, {
+            username: username,
+            imageURL: downloadURL
+          });
+          setUserImageURL(downloadURL);
         });
-        setUserImageURL(downloadURL);
       });
-    });
+    } else {
+      // User did not select a new image, just save profile with existing imageURL
+      set(userProfileRef, {
+        username: username,
+        imageURL: userImageURL || "https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"
+      });
+    }
   };
 
   return (
