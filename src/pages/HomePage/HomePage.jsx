@@ -29,44 +29,58 @@ const HomePage = () => {
     };
   }, [db]);
   
-
   const handleCreatePost = async () => {
     const user = auth.currentUser;
+    const postsRef = ref(db, 'posts');
+    const newPostRef = push(postsRef);
+  
     if (user) {
       const userRef = ref(db, `users/${user.uid}`);
       const userDataSnap = await get(userRef);
       const userData = userDataSnap.val();
-      const postsRef = ref(db, 'posts');
-      const newPostRef = push(postsRef);
+  
       set(newPostRef, {
         ...newPost,
-        username: userData.username,
-        userImageURL: userData.imageURL,
+        username: userData?.username || 'Anonymous',
+        userImageURL: userData?.imageURL || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg',
         replies: [],
         userId: user.uid,
       });
-      setNewPost({ title: '', content: '' });
     } else {
-      console.log("No user is signed in.");
+      set(newPostRef, {
+        ...newPost,
+        username: 'Anonymous',
+        userImageURL: 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg',
+        replies: [],
+      });
     }
+    setNewPost({ title: '', content: '' });
   };
-
-  const handleAddReply = async (postId, replyText = '') => {
+  
+  const handleAddReply = async (postId, replyText) => {
     const user = auth.currentUser;
+    const postRepliesRef = ref(db, `posts/${postId}/replies`);
+    const newReplyRef = push(postRepliesRef);
+  
     if (replyText.trim() && user) {
       const userRef = ref(db, `users/${user.uid}`);
       const userDataSnap = await get(userRef);
       const userData = userDataSnap.val();
-      const postRepliesRef = ref(db, `posts/${postId}/replies`);
-      const newReplyRef = push(postRepliesRef);
+  
       set(newReplyRef, {
         text: replyText,
-        username: userData.username,
-        userImageURL: userData.imageURL,
+        username: userData?.username || 'Anonymous',
+        userImageURL: userData?.imageURL || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg',
         userId: user.uid,
       });
-      setReplyTexts({ ...replyTexts, [postId]: '' });
+    } else {
+      set(newReplyRef, {
+        text: replyText.trim(),
+        username: 'Anonymous',
+        userImageURL: 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg',
+      });
     }
+    setReplyTexts({ ...replyTexts, [postId]: '' });
   };
 
   return (
@@ -102,7 +116,7 @@ const HomePage = () => {
             <div className="replies">
               {post.replies && Object.values(post.replies).map((reply, index) => (
                 <div className="reply" key={index}>
-                  <img src={reply.userImageURL || 'path/to/your/default/avatar.jpg'} alt={`${reply.username || "Anonymous"}'s avatar`} className="reply-avatar" />
+                  <img src={reply.userImageURL || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg'} alt={`${reply.username || "Anonymous"}'s avatar`} className="reply-avatar" />
                   <span className="reply-username">{reply.username || "Anonymous"}</span>
                   <p>{reply.text}</p>
                 </div>
