@@ -45,6 +45,8 @@ const HomePage = () => {
         userImageURL: userData?.imageURL || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg',
         replies: [],
         userId: user.uid,
+        thumbsUp: 0,
+        thumbsDown: 0
       });
     } else {
       set(newPostRef, {
@@ -52,10 +54,13 @@ const HomePage = () => {
         username: 'Anonymous',
         userImageURL: 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg',
         replies: [],
+        thumbsUp: 0,
+        thumbsDown: 0
       });
     }
     setNewPost({ title: '', content: '' });
   };
+  
   
   const handleAddReply = async (postId, replyText) => {
     const user = auth.currentUser;
@@ -72,17 +77,61 @@ const HomePage = () => {
         username: userData?.username || 'Anonymous',
         userImageURL: userData?.imageURL || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg',
         userId: user.uid,
+        thumbsUp: 0,
+        thumbsDown: 0
       });
     } else {
       set(newReplyRef, {
         text: replyText.trim(),
         username: 'Anonymous',
         userImageURL: 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg',
+        thumbsUp: 0,
+        thumbsDown: 0
       });
     }
     setReplyTexts({ ...replyTexts, [postId]: '' });
   };
 
+  const handleThumbsUp = async (postId, isReply = false, replyId = null) => {
+    if (!replyId && isReply) {
+      console.error("No reply ID provided for thumbs up.");
+      return;
+    }
+    const refPath = isReply ? `posts/${postId}/replies/${replyId}` : `posts/${postId}`;
+    const postRef = ref(db, refPath);
+    const snap = await get(postRef);
+    const data = snap.val();
+    
+    if (data) {
+      set(postRef, {
+        ...data,
+        thumbsUp: (data.thumbsUp || 0) + 1,
+      });
+    } else {
+      console.log("Failed to find data at", refPath);
+    }
+  };
+  
+  const handleThumbsDown = async (postId, isReply = false, replyId = null) => {
+    if (!replyId && isReply) {
+      console.error("No reply ID provided for thumbs down.");
+      return;
+    }
+    const refPath = isReply ? `posts/${postId}/replies/${replyId}` : `posts/${postId}`;
+    const postRef = ref(db, refPath);
+    const snap = await get(postRef);
+    const data = snap.val();
+    
+    if (data) {
+      set(postRef, {
+        ...data,
+        thumbsDown: (data.thumbsDown || 0) + 1,
+      });
+    } else {
+      console.log("Failed to find data at", refPath);
+    }
+  };
+  
   return (
     <div>
       <Header />
@@ -113,12 +162,20 @@ const HomePage = () => {
             </div>
             <h3>{post.title}</h3>
             <p>{post.content}</p>
+            <div>
+              <button onClick={() => handleThumbsUp(post.id)}>👍 ({post.thumbsUp || 0})</button>
+              <button onClick={() => handleThumbsDown(post.id)}>👎 ({post.thumbsDown || 0})</button>
+            </div>
             <div className="replies">
-              {post.replies && Object.values(post.replies).map((reply, index) => (
-                <div className="reply" key={index}>
+              {post.replies && Object.entries(post.replies).map(([replyId, reply]) => (
+                <div className="reply" key={replyId}>
                   <img src={reply.userImageURL || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg'} alt={`${reply.username || "Anonymous"}'s avatar`} className="reply-avatar" />
                   <span className="reply-username">{reply.username || "Anonymous"}</span>
                   <p>{reply.text}</p>
+                  <div>
+                    <button onClick={() => handleThumbsUp(post.id, true, replyId)}>👍 ({reply.thumbsUp || 0})</button>
+                    <button onClick={() => handleThumbsDown(post.id, true, replyId)}>👎 ({reply.thumbsDown || 0})</button>
+                  </div>
                 </div>
               ))}
               <div className="reply-input-container">
@@ -131,7 +188,7 @@ const HomePage = () => {
                 />
                 <button
                   className="reply-button"
-                  onClick={() => handleAddReply(post.id, replyTexts[post.id] || '')} // Fallback to an empty string if undefined
+                  onClick={() => handleAddReply(post.id, replyTexts[post.id] || '')}
                 >
                   Reply
                 </button>
@@ -145,6 +202,8 @@ const HomePage = () => {
       </footer>
     </div>
   );
+  
+  
 };
 
 export default HomePage;
