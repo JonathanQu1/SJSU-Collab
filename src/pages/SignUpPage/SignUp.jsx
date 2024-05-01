@@ -25,7 +25,7 @@ function SignUp() {
         const user = userCredential.user;
         console.log('Account created:', user);
         alert('Account successfully created! You will be redirected to login.');
-        navigate('/login'); // Redirect the user after success
+        navigate('/'); // Redirect the user after success
 
         // You can redirect the user to the home page or show a success message
       })

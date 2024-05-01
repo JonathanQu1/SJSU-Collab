@@ -17,7 +17,7 @@ function LoginPage() {
       .then((userCredential) => {
         // Sign-in successful.
         console.log('Logged in:', userCredential.user);
-        navigate('/'); // Redirect the user to the homepage
+        navigate('/home'); // Redirect the user to the homepage
       })
       .catch((error) => {
         // An error happened.
