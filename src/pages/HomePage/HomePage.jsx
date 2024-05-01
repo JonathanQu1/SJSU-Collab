@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getAuth } from 'firebase/auth';
-import { getDatabase, ref, onValue, push, set, get } from 'firebase/database';
+import { getDatabase, ref, onValue, push, set, get, remove } from 'firebase/database';
 import firebaseApp from '../../configuration/firebase-config';
 import './HomePage.css';
 import Header from '../../components/Header/Header.jsx';
@@ -33,6 +33,7 @@ const HomePage = () => {
     const user = auth.currentUser;
     const postsRef = ref(db, 'posts');
     const newPostRef = push(postsRef);
+    const timestamp = Date.now();
   
     if (user) {
       const userRef = ref(db, `users/${user.uid}`);
@@ -47,7 +48,8 @@ const HomePage = () => {
         userId: user.uid,
         thumbsUp: 0,
         thumbsDown: 0,
-        votes: {}  // New field to track individual votes
+        votes: {},  // New field to track individual votes
+        timestamp
       });
       
     } else {
@@ -57,7 +59,9 @@ const HomePage = () => {
         userImageURL: 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg',
         replies: [],
         thumbsUp: 0,
-        thumbsDown: 0
+        thumbsDown: 0,
+        timestamp
+
       });
     }
     setNewPost({ title: '', content: '' });
@@ -136,6 +140,26 @@ const HomePage = () => {
       console.log("Failed to find data at", refPath);
     }
   };
+
+  const handleDeletePost = async (postId) => {
+    const postRef = ref(db, `posts/${postId}`);
+    try {
+      await remove(postRef);
+      console.log('Post deleted successfully');
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
+
+  const handleDeleteReply = async (postId, replyId) => {
+    const replyRef = ref(db, `posts/${postId}/replies/${replyId}`);
+    try {
+      await remove(replyRef);
+      console.log('Reply deleted successfully');
+    } catch (error) {
+      console.error('Error deleting reply:', error);
+    }
+  };
   
   
   return (
@@ -168,9 +192,18 @@ const HomePage = () => {
             </div>
             <h3>{post.title}</h3>
             <p>{post.content}</p>
-            <div>
+            <div className = "thumbs-delete">
+              <div>
               <button className = "post-thumbs" onClick={() => handleVote(post.id, false, null, 'up')}>👍 ({post.thumbsUp || 0})</button>
               <button className = "post-thumbs" onClick={() => handleVote(post.id, false, null, 'down')}>👎 ({post.thumbsDown || 0})</button>
+              </div>
+              <div>
+              {post.userId === auth.currentUser?.uid && (
+                <button className="delete-button" onClick={() => handleDeletePost(post.id)}>
+                  Delete Post
+                </button>
+              )}
+              </div>
             </div>
             <div className="replies">
               {post.replies && Object.entries(post.replies).map(([replyId, reply]) => (
@@ -178,9 +211,18 @@ const HomePage = () => {
                   <img src={reply.userImageURL || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg'} alt={`${reply.username || "Anonymous"}'s avatar`} className="reply-avatar" />
                   <span className="reply-username">{reply.username || "Anonymous"}</span>
                   <p id = "reply-content">{reply.text}</p>
-                  <div>
+                  <div className = "thumbs-delete">
+                    <div>
                     <button className = "reply-thumbs" onClick={() => handleVote(post.id, true, replyId, 'up')}>👍 ({reply.thumbsUp || 0})</button>
                     <button className = "reply-thumbs" onClick={() => handleVote(post.id, true, replyId, 'down')}>👎 ({reply.thumbsDown || 0}) </button>
+                    </div>
+                    <div>
+                    {reply.userId === auth.currentUser?.uid && (
+                      <button className="delete-button" onClick={() => handleDeleteReply(post.id, replyId)}>
+                        Delete Reply
+                      </button>
+                    )}
+                    </div>
                   </div>
                 </div>
               ))}
