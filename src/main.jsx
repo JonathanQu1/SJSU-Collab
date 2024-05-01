@@ -13,8 +13,8 @@ root.render(
     <Router>
       <Routes>
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/" element={<HomePage />} /> {/* HomePage at the root path */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/home" element={<HomePage />} /> 
         <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </Router>

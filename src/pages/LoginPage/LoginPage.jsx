@@ -40,7 +40,7 @@ function LoginPage() {
           <button type="submit" id="submit">Login</button>
       </form>
         <p>Not a member? <Link to="/signup">Register Now</Link></p>
-        <p><Link to="/">Home</Link></p>
+        <p><Link to="/home">Home</Link></p>
       </div>
       <div className="welcome-back">
         <h1>Spartan Collab</h1>

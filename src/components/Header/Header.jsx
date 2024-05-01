@@ -46,8 +46,8 @@ const Header = () => {
         </button>
         <div className="dropdown-content">
           <p><Link to="/profile">Profile</Link></p>
-          <p><Link to="/">Home</Link></p>
-          <p><Link to="/login">Sign Out</Link></p>
+          <p><Link to="/home">Home</Link></p>
+          <p><Link to="/">Sign Out</Link></p>
         </div>
       </div>
     </header>

@@ -66,7 +66,7 @@ function SignUp() {
           />
           <button type="submit">Create Account</button>
           <p>
-            Already have an account? <Link to="/login">Sign in</Link>
+            Already have an account? <Link to="/">Sign in</Link>
           </p>
         </form>
       </div>
