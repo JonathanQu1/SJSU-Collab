@@ -24,7 +24,7 @@ function LoginPage() {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.error('Error signing in:', errorCode, errorMessage);
-        alert("Username or password is inccorect, please try again!")
+        alert("Username or password is incorrect, please try again!")
         // Here you can show an error message to the user
       });
   };
