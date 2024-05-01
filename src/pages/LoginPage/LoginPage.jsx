@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import './LoginPage.css';
+import groupworkLogo from '../../assets/groupworkLogo.png';
 
 function LoginPage() {
   const navigate = useNavigate(); // Hook to navigate to other routes
@@ -45,7 +46,7 @@ function LoginPage() {
       <div className="welcome-back">
         <h1>Spartan Collab</h1>
         <p>Where Talents Merge, Projects Emerge.</p>
-        <img className="login_logo" src="src/assets/groupworkLogo.png" alt="Collab Logo" />
+        <img className="login_logo" src={groupworkLogo} alt="Collab Logo" />
       </div>
     </div>
   );
