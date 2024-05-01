@@ -20,7 +20,7 @@ const HomePage = () => {
         id: key,
         ...value,
       }));
-      setPosts(formattedPosts);
+      setPosts(formattedPosts.reverse());
     });
   
     // Cleanup function
