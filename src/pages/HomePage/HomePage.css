@@ -120,7 +120,9 @@ html{
   display: inline-block; 
   border: 1px solid #ccc; 
   border-radius: 4px; 
-  box-sizing: border-box; 
+  box-sizing: border-box;
+  font-size: 15px;
+  font-family: Arial, sans-serif;
 }
 
 #postTitle {
@@ -186,15 +188,7 @@ html{
   padding: 10px 15px; 
   font-size: 16px; 
   line-height: 1; 
-  border: none; 
-  border-radius: 4px; 
-  background-color: #f0ad4e; 
-  color: white; 
-  cursor: pointer; 
-  transition: background-color 0.3s ease; 
 }
-
-
 
 .new-post-button{
   background-color: #f0ad4e;
@@ -211,6 +205,7 @@ html{
   margin-left: auto;
   margin-right: auto;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease-in-out;
 }
 
 .replies {
@@ -239,7 +234,6 @@ html{
   background-color: #ec971f; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
 }
-
 
 .reply-input::placeholder,
 .reply-button::placeholder {
@@ -277,6 +271,7 @@ html{
   cursor: pointer;
   margin-right: 5px;
   font-size: 16px;
+  transition: all 0.2s ease-in-out;
 }
 
 /* General button styling for reply thumbs */
@@ -287,6 +282,7 @@ html{
   cursor: pointer;
   margin-right: 4px;
   font-size: 14px;
+  transition: all 0.2s ease-in-out;
 }
 
 /* Hover effects for both post and reply thumbs */
@@ -300,20 +296,41 @@ html{
 }
 
 .delete-button {
-  background-color: #dc3545;
+  background-color: #e57373;
   color: white;
   border: none;
   border-radius: 4px;
   padding: 4px 8px;
   font-size: 14px;
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
 .delete-button:hover {
-  background-color: #c82333;
+  background-color: #ef5350;
 }
 
-.thumbs-delete{
+.vote-and-delete{
   display: flex;
   justify-content: space-between;
+}
+
+.sort-button{
+  padding: 10px;
+  width: 200px;
+  margin-bottom: 20px;
+  background-color: #f0ad4e; 
+  color: white; 
+  background-color: #f0ad4e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease-in-out;
+}
+
+.sort-button:hover {
+  background-color: #ec971f; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
 }

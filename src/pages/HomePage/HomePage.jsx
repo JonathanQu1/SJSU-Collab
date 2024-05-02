@@ -9,6 +9,7 @@ const HomePage = () => {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState({ title: '', content: '' });
   const [replyTexts, setReplyTexts] = useState({});
+  const [isOldestFirst, setIsOldestFirst] = useState(false);  // State to track sorting order
   const db = getDatabase(firebaseApp);
   const auth = getAuth(firebaseApp);
 
@@ -16,30 +17,34 @@ const HomePage = () => {
     const postsRef = ref(db, 'posts');
     const unsubscribe = onValue(postsRef, (snapshot) => {
       const data = snapshot.val() || {};
-      const formattedPosts = Object.entries(data).map(([key, value]) => ({
+      let formattedPosts = Object.entries(data).map(([key, value]) => ({
         id: key,
         ...value,
       }));
-      setPosts(formattedPosts.reverse());
+      // Reverse the list only if isOldestFirst is false (i.e., show newest first)
+      if (!isOldestFirst) {
+        formattedPosts = formattedPosts.reverse();  // Reverse for latest first
+      }
+      setPosts(formattedPosts);
     });
   
     // Cleanup function
     return () => {
-      unsubscribe(); // This is the correct way to unsubscribe
+      unsubscribe();
     };
-  }, [db]);
-  
+  }, [db, isOldestFirst]);   // Include isOldestFirst in the dependency array
+
   const handleCreatePost = async () => {
     const user = auth.currentUser;
     const postsRef = ref(db, 'posts');
     const newPostRef = push(postsRef);
     const timestamp = Date.now();
-  
+
     if (user) {
       const userRef = ref(db, `users/${user.uid}`);
       const userDataSnap = await get(userRef);
       const userData = userDataSnap.val();
-  
+
       set(newPostRef, {
         ...newPost,
         username: userData?.username || 'Anonymous',
@@ -48,10 +53,10 @@ const HomePage = () => {
         userId: user.uid,
         thumbsUp: 0,
         thumbsDown: 0,
-        votes: {},  // New field to track individual votes
+        votes: {},
         timestamp
       });
-      
+
     } else {
       set(newPostRef, {
         ...newPost,
@@ -61,23 +66,21 @@ const HomePage = () => {
         thumbsUp: 0,
         thumbsDown: 0,
         timestamp
-
       });
     }
     setNewPost({ title: '', content: '' });
   };
-  
-  
+
   const handleAddReply = async (postId, replyText) => {
     const user = auth.currentUser;
     const postRepliesRef = ref(db, `posts/${postId}/replies`);
     const newReplyRef = push(postRepliesRef);
-  
+
     if (replyText.trim() && user) {
       const userRef = ref(db, `users/${user.uid}`);
       const userDataSnap = await get(userRef);
       const userData = userDataSnap.val();
-  
+
       set(newReplyRef, {
         text: replyText,
         username: userData?.username || 'Anonymous',
@@ -103,22 +106,22 @@ const HomePage = () => {
       console.error("No reply ID provided for voting.");
       return;
     }
-  
+
     const user = auth.currentUser;
     if (!user) {
       alert("Please log in to vote.");
       return;
     }
-  
+
     const refPath = isReply ? `posts/${postId}/replies/${replyId}` : `posts/${postId}`;
     const postRef = ref(db, refPath);
     const snap = await get(postRef);
     const data = snap.val();
-  
+
     if (data) {
       const currentVotes = data.votes || {};
       const userVote = currentVotes[user.uid];
-  
+
       if (userVote === voteType) {
         // Toggle off
         delete currentVotes[user.uid];
@@ -126,10 +129,10 @@ const HomePage = () => {
         // Add or switch vote
         currentVotes[user.uid] = voteType;
       }
-  
+
       const thumbsUpCount = Object.values(currentVotes).filter(vote => vote === 'up').length;
       const thumbsDownCount = Object.values(currentVotes).filter(vote => vote === 'down').length;
-  
+
       set(postRef, {
         ...data,
         votes: currentVotes,
@@ -160,8 +163,7 @@ const HomePage = () => {
       console.error('Error deleting reply:', error);
     }
   };
-  
-  
+
   return (
     <div>
       <Header />
@@ -184,6 +186,9 @@ const HomePage = () => {
         <button className="new-post-button" onClick={handleCreatePost}>
           Create Post
         </button>
+        <button className="sort-button" onClick={() => setIsOldestFirst(!isOldestFirst)}>
+          {isOldestFirst ? 'Sort: Newest to Latest' : 'Sort: Oldest to Latest'}
+        </button>
         {posts.map((post) => (
           <div className="post" key={post.id}>
             <div className="post-header">
@@ -192,17 +197,17 @@ const HomePage = () => {
             </div>
             <h3>{post.title}</h3>
             <p>{post.content}</p>
-            <div className = "thumbs-delete">
+            <div className="vote-and-delete">
               <div>
-              <button className = "post-thumbs" onClick={() => handleVote(post.id, false, null, 'up')}>👍 ({post.thumbsUp || 0})</button>
-              <button className = "post-thumbs" onClick={() => handleVote(post.id, false, null, 'down')}>👎 ({post.thumbsDown || 0})</button>
+                <button className="post-thumbs" onClick={() => handleVote(post.id, false, null, 'up')}>👍 ({post.thumbsUp || 0})</button>
+                <button className="post-thumbs" onClick={() => handleVote(post.id, false, null, 'down')}>👎 ({post.thumbsDown || 0})</button>
               </div>
               <div>
-              {post.userId === auth.currentUser?.uid && (
-                <button className="delete-button" onClick={() => handleDeletePost(post.id)}>
-                  Delete Post
-                </button>
-              )}
+                {post.userId === auth.currentUser?.uid && (
+                  <button className="delete-button" onClick={() => handleDeletePost(post.id)}>
+                    Delete Post
+                  </button>
+                )}
               </div>
             </div>
             <div className="replies">
@@ -210,18 +215,18 @@ const HomePage = () => {
                 <div className="reply" key={replyId}>
                   <img src={reply.userImageURL || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg'} alt={`${reply.username || "Anonymous"}'s avatar`} className="reply-avatar" />
                   <span className="reply-username">{reply.username || "Anonymous"}</span>
-                  <p id = "reply-content">{reply.text}</p>
-                  <div className = "thumbs-delete">
+                  <p id="reply-content">{reply.text}</p>
+                  <div className="vote-and-delete">
                     <div>
-                    <button className = "reply-thumbs" onClick={() => handleVote(post.id, true, replyId, 'up')}>👍 ({reply.thumbsUp || 0})</button>
-                    <button className = "reply-thumbs" onClick={() => handleVote(post.id, true, replyId, 'down')}>👎 ({reply.thumbsDown || 0}) </button>
+                      <button className="reply-thumbs" onClick={() => handleVote(post.id, true, replyId, 'up')}>👍 ({reply.thumbsUp || 0})</button>
+                      <button className="reply-thumbs" onClick={() => handleVote(post.id, true, replyId, 'down')}>👎 ({reply.thumbsDown || 0})</button>
                     </div>
                     <div>
-                    {reply.userId === auth.currentUser?.uid && (
-                      <button className="delete-button" onClick={() => handleDeleteReply(post.id, replyId)}>
-                        Delete Reply
-                      </button>
-                    )}
+                      {reply.userId === auth.currentUser?.uid && (
+                        <button className="delete-button" onClick={() => handleDeleteReply(post.id, replyId)}>
+                          Delete Reply
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -250,8 +255,6 @@ const HomePage = () => {
       </footer>
     </div>
   );
-  
-  
 };
 
 export default HomePage;
