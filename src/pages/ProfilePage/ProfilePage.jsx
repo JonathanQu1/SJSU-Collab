@@ -16,16 +16,11 @@ function ProfilePage() {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
         const uid = user.uid;
-        // Fetch the username and image URL from the database
         getUserProfile(uid);
-      } else {
-        // User is signed out
       }
     });
-  }, [auth, database]); // Dependencies array for the useEffect hook
+  }, [auth, database]);
 
   const getUserProfile = (uid) => {
     const userProfileRef = databaseRef(database, 'users/' + uid);
@@ -58,22 +53,30 @@ function ProfilePage() {
     const userProfileRef = databaseRef(database, 'users/' + uid);
   
     if (userImage) {
-      // User selected a new image, upload it and then save profile
       const userImageRef = storageRef(storage, `userImages/${uid}`);
       uploadBytes(userImageRef, userImage).then((snapshot) => {
         getDownloadURL(snapshot.ref).then((downloadURL) => {
           set(userProfileRef, {
             username: username,
             imageURL: downloadURL
+          }).then(() => {
+            alert("Profile updated successfully!");
+            window.location.reload();  // Refresh the page
+          }).catch((error) => {
+            alert("Failed to update profile: " + error.message);
           });
           setUserImageURL(downloadURL);
         });
       });
     } else {
-      // User did not select a new image, just save profile with existing imageURL
       set(userProfileRef, {
         username: username,
         imageURL: userImageURL || "https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"
+      }).then(() => {
+        alert("Profile updated successfully!");
+        window.location.reload();  // Refresh the page
+      }).catch((error) => {
+        alert("Failed to update profile: " + error.message);
       });
     }
   };
