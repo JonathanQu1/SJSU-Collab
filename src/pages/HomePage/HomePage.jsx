@@ -15,24 +15,30 @@ const HomePage = () => {
 
   useEffect(() => {
     const postsRef = ref(db, 'posts');
-    const unsubscribe = onValue(postsRef, (snapshot) => {
+    const unsubscribe = onValue(postsRef, async (snapshot) => {
       const data = snapshot.val() || {};
-      let formattedPosts = Object.entries(data).map(([key, value]) => ({
-        id: key,
-        ...value,
+      let formattedPosts = await Promise.all(Object.entries(data).map(async ([key, value]) => {
+        const userRef = ref(db, `users/${value.userId}`);
+        const userDataSnap = await get(userRef);
+        const userData = userDataSnap.val();
+  
+        return {
+          id: key,
+          ...value,
+          username: userData?.username || 'Anonymous',  // Fetch username dynamically
+        };
       }));
-      // Reverse the list only if isOldestFirst is false (i.e., show newest first)
+  
       if (!isOldestFirst) {
-        formattedPosts = formattedPosts.reverse();  // Reverse for latest first
+        formattedPosts = formattedPosts.reverse();
       }
       setPosts(formattedPosts);
     });
   
-    // Cleanup function
     return () => {
       unsubscribe();
     };
-  }, [db, isOldestFirst]);   // Include isOldestFirst in the dependency array
+  }, [db, isOldestFirst]);
 
   const handleCreatePost = async () => {
     const user = auth.currentUser;
