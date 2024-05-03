@@ -22,10 +22,24 @@ const HomePage = () => {
         const userDataSnap = await get(userRef);
         const userData = userDataSnap.val();
   
+        let replies = value.replies || {};
+        const formattedReplies = await Promise.all(Object.entries(replies).map(async ([replyKey, replyValue]) => {
+          const replyUserRef = ref(db, `users/${replyValue.userId}`);
+          const replyUserDataSnap = await get(replyUserRef);
+          const replyUserData = replyUserDataSnap.val();
+  
+          return {
+            id: replyKey,
+            ...replyValue,
+            username: replyUserData?.username || 'Anonymous',  // Fetch username dynamically for replies
+          };
+        }));
+  
         return {
           id: key,
           ...value,
-          username: userData?.username || 'Anonymous',  // Fetch username dynamically
+          username: userData?.username || 'Anonymous',  // Fetch username dynamically for posts
+          replies: formattedReplies.reduce((acc, curr) => ({...acc, [curr.id]: curr}), {}),
         };
       }));
   
@@ -39,7 +53,7 @@ const HomePage = () => {
       unsubscribe();
     };
   }, [db, isOldestFirst]);
-
+  
   const handleCreatePost = async () => {
     const user = auth.currentUser;
     const postsRef = ref(db, 'posts');
