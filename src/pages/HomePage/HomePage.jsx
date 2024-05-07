@@ -32,6 +32,7 @@ const HomePage = () => {
             id: replyKey,
             ...replyValue,
             username: replyUserData?.username || 'Anonymous',  // Fetch username dynamically for replies
+            userImageURL: replyUserData?.imageURL || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg',
           };
         }));
   
@@ -39,6 +40,7 @@ const HomePage = () => {
           id: key,
           ...value,
           username: userData?.username || 'Anonymous',  // Fetch username dynamically for posts
+          userImageURL: userData?.imageURL || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg',
           replies: formattedReplies.reduce((acc, curr) => ({...acc, [curr.id]: curr}), {}),
         };
       }));
@@ -53,6 +55,7 @@ const HomePage = () => {
       unsubscribe();
     };
   }, [db, isOldestFirst]);
+  
   
   const handleCreatePost = async () => {
     const user = auth.currentUser;
