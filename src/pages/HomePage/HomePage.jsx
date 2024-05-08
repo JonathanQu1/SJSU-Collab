@@ -210,7 +210,7 @@ const HomePage = () => {
           Create Post
         </button>
         <button className="sort-button" onClick={() => setIsOldestFirst(!isOldestFirst)}>
-          {isOldestFirst ? 'Sort: Newest to Latest' : 'Sort: Oldest to Latest'}
+          {isOldestFirst ? 'Sort: Latest to Oldest' : 'Sort: Oldest to Latest'}
         </button>
         {posts.map((post) => (
           <div className="post" key={post.id}>
