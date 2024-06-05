@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getAuth } from 'firebase/auth';
 import { getDatabase, ref, onValue, push, set, get, remove } from 'firebase/database';
-import firebaseApp from '../../configuration/firebase-config';
 import './HomePage.css';
 import Header from '../../components/Header/Header.jsx';
 
@@ -10,8 +9,8 @@ const HomePage = () => {
   const [newPost, setNewPost] = useState({ title: '', content: '' });
   const [replyTexts, setReplyTexts] = useState({});
   const [isOldestFirst, setIsOldestFirst] = useState(false);  // State to track sorting order
-  const db = getDatabase(firebaseApp);
-  const auth = getAuth(firebaseApp);
+  const db = getDatabase();
+  const auth = getAuth();
 
   useEffect(() => {
     const postsRef = ref(db, 'posts');
