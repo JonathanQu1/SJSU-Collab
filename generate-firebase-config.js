@@ -1,9 +1,10 @@
-// generate-firebase-config.js
-const fs = require('fs');
-const path = require('path');
+// generate-firebase-config.js using ESM syntax
+import fs from 'fs';
+import path from 'path';
+import { initializeApp } from 'firebase/app';
 
 const firebaseConfig = `
-import { initializeApp } from "firebase/app";
+import { initializeApp } from 'firebase/app';
 
 const config = {
   apiKey: "${process.env.REACT_APP_API_KEY}",
@@ -18,5 +19,5 @@ const firebaseApp = initializeApp(config);
 export default firebaseApp;
 `;
 
-const filePath = path.join(__dirname, 'src', 'configuration', 'firebase-config.js');
+const filePath = path.join(process.cwd(), 'src', 'configuration', 'firebase-config.js');
 fs.writeFileSync(filePath, firebaseConfig);
