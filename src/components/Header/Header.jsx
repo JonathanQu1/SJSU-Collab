@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { Link, useNavigate } from 'react-router-dom';  // Updated here
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { getDatabase, ref as databaseRef, get } from 'firebase/database';
 import './Header.css';
 
@@ -8,12 +8,12 @@ const Header = () => {
   const [userProfileImage, setUserProfileImage] = useState('https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg');
   const auth = getAuth();
   const database = getDatabase();
+  const navigate = useNavigate(); // Updated here
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const uid = user.uid;
-        // Fetch the user's profile image URL from the database
         const userProfileRef = databaseRef(database, 'users/' + uid);
         get(userProfileRef).then((snapshot) => {
           if (snapshot.exists()) {
@@ -26,7 +26,15 @@ const Header = () => {
       }
     });
   }, [auth, database]);
-  
+
+  const handleSignOut = () => {
+    signOut(auth).then(() => {
+      navigate('/'); // Redirect to the sign-in page after sign-out using navigate
+    }).catch((error) => {
+      console.error('Sign out error:', error);
+    });
+  };
+
   return (
     <header>
       <img 
@@ -47,7 +55,7 @@ const Header = () => {
         <div className="dropdown-content">
           <p><Link to="/profile">Profile</Link></p>
           <p><Link to="/home">Home</Link></p>
-          <p><Link to="/">Sign Out</Link></p>
+          <p id = "signOutButton" onClick={handleSignOut} style={{cursor: 'pointer'}}>Sign Out</p>
         </div>
       </div>
     </header>

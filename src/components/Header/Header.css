@@ -19,3 +19,8 @@ header {
     display: flex;
     align-self: center;
   }
+
+  #signOutButton{
+    color: black;
+    padding: 12px 16px;
+  }
