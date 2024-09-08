@@ -15,17 +15,22 @@ function LoginPage() {
     const auth = getAuth();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Sign-in successful.
-        console.log('Logged in:', userCredential.user);
-        navigate('/home'); // Redirect the user to the homepage
+        const user = userCredential.user;
+
+        if (user.emailVerified) {
+          // If email is verified, allow user to proceed
+          console.log('Logged in:', user);
+          navigate('/home'); // Redirect the user to the homepage
+        } else {
+          // If email is not verified, show an alert
+          alert('Please verify your email before logging in.');
+        }
       })
       .catch((error) => {
-        // An error happened.
         const errorCode = error.code;
         const errorMessage = error.message;
         console.error('Error signing in:', errorCode, errorMessage);
-        alert("Username or password is incorrect, please try again!")
-        // Here you can show an error message to the user
+        alert("Username or password is incorrect, please try again!");
       });
   };
 
@@ -39,7 +44,7 @@ function LoginPage() {
           <input type="email" id="username" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <input type="password" id="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           <button type="submit" id="submit">Login</button>
-      </form>
+        </form>
         <p>Not a member? <Link to="/signup">Register Now</Link></p>
       </div>
       <div className="welcome-back">
