@@ -44,7 +44,7 @@ function LoginPage() {
           <input type="email" id="username" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <input type="password" id="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           <button type="submit" id="submit">Login</button>
-        </form>
+      </form>
         <p>Not a member? <Link to="/signup">Register Now</Link></p>
       </div>
       <div className="welcome-back">
